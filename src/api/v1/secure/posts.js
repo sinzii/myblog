@@ -3,7 +3,7 @@ let router = express.Router();
 
 module.exports = router;
 
-router.get('/posts', (req, res) => {
+router.get('/', (req, res) => {
     res.json([
         {
             id: '1',

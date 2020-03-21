@@ -3,4 +3,4 @@ let postsRouter = require('./posts');
 
 module.exports = router;
 
-router.use('/', postsRouter);
+router.use('/posts', postsRouter);

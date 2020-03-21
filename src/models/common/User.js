@@ -1,6 +1,7 @@
-let mongoose = require('mongoose');
+const mongoose = require('mongoose');
+const auditableProps = require('../auditable')();
 
-let UserSchema = new mongoose.Schema({
+const UserSchema = new mongoose.Schema(Object.assign({
     name: String,
     username: {
         type: String,
@@ -15,5 +16,6 @@ let UserSchema = new mongoose.Schema({
     password: String,
     salt: String,
     avatar: String
-});
+}, auditableProps));
 
+mongoose.model('User', UserSchema);

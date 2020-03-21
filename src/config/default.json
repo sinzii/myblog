@@ -1,3 +1,4 @@
 {
-    "mongooseUrl": "YOUR_MONGO_PRODUCTION_URL"
+    "mongooseUrl": "YOUR_MONGO_PRODUCTION_URL",
+    "httpPort": 3000
 }
