@@ -1,6 +1,9 @@
 let express = require('express');
 let logger = require('morgan');
 let cookieParser = require('cookie-parser');
+let mongoose = require('mongoose');
+let ResourceNotFoundException = require('./exceptions/404');
+let config = require('./config');
 
 let app = express();
 
@@ -24,39 +27,48 @@ app.use(express.urlencoded({extended: false})); // Allow parsing urlencoded in s
 app.use(cookieParser()); // Parse cookies from request and save them to req.cookies
 
 /*------------------------------------
+    Setup MongoDB
+------------------------------------*/
+mongoose.connect(config.mongooseUrl);
+if (config.dev_mode) {
+    mongoose.set('debug', true);
+}
+
+// Loads mongoose modals
+require('./models');
+
+/*------------------------------------
     Setup endpoints
 ------------------------------------*/
 let apiV1 = require('./api/v1');
 app.use('/api/v1', apiV1);
 
 app.get('/', (req, res) => {
-    res.setHeader("Content-Type", "application/json");
     res.json({message: "Welcome to Project Alpha API"});
 });
 
 // A sample error endpoint
-app.get('/error', (req, res) => {
-   throw Error("There is an error");
+app.get('/error', (req, res, next) => {
+    next(Error("There is an error"));
 });
 
 /*------------------------------------
     Handle errors
 ------------------------------------*/
 app.use((req, res, next) => {
-    res.status(404);
-    res.json({
-        code: 404,
-        message: "You're lost!"
-    });
+    next(new ResourceNotFoundException());
 });
 
 app.use((err, req, res, next) => {
-    console.log(err.message);
+    console.dir(err.constructor.name);
 
-    res.status(500);
+    let statusCode = err.status || 500;
+    let message = err.message || "We're getting a problem, please comeback later.";
+
+    res.status(statusCode);
     res.json({
-        code: 500,
-        message: "We're getting a problem, please comeback later."
+        statusCode,
+        message
     });
 });
 
