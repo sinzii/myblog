@@ -1,15 +1,9 @@
-class ResourceNotFoundException extends Error {
-    constructor(message) {
-        super();
-        this.status = 404;
-        this.message = message || "Seem you're lost!";
-    }
+const HttpResponseError = require('./HttpRequestError');
 
-    handleException(req, res) {
-        console.log("Haha I'm hanelding this exception");
-
-        return res.status(this.status).json({message: 'You are lost, please go back where you came from :D'})
+class ResourceNotFound extends HttpResponseError {
+    constructor(message = "Seem you're lost!") {
+        super(404, message);
     }
 }
 
-module.exports = ResourceNotFoundException;
+module.exports = ResourceNotFound;

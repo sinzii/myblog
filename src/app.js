@@ -41,7 +41,7 @@ if (config.dev_mode) {
     mongoose.set('debug', true);
 }
 
-// Loads mongoose modals
+// Loads mongoose models
 require('./models');
 
 /*------------------------------------
@@ -54,11 +54,6 @@ app.get('/', (req, res) => {
     res.json({message: "Welcome to Project Alpha API"});
 });
 
-// A sample error endpoint
-app.get('/error', (req, res, next) => {
-    next(Error("There is an error"));
-});
-
 /*------------------------------------
     Handle errors
 ------------------------------------*/
@@ -67,8 +62,8 @@ app.use((req, res, next) => {
 });
 
 app.use((err, req, res, next) => {
-    if (typeof err.handleException === 'function') {
-        return err.handleException(req, res);
+    if (typeof err.handleError === 'function') {
+        return err.handleError(req, res);
     }
 
     const {status} = err;
