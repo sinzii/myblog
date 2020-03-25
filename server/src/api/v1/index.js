@@ -10,11 +10,10 @@ const authentication = (req, res, next) => {
     const authorization = req.header('Authorization');
     if (authorization) {
         const authToken = authorization.trim().split(/\s+/);
-        if (authToken.length === 2 && authToken[0] === 'Bearer' && authToken[1]) {
-            const token = authToken[1];
-            if (token === 'hello-world') {
-                return next();
-            }
+        const [authType, token] = authToken;
+
+        if (authType === 'Bearer' && token === 'hello-world') {
+            return next();
         }
     }
     return next(new NotAuthorized());
