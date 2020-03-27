@@ -1,3 +1,3 @@
 # MyBlog
-My personal blog written in ExpressJS and ReactJS
+My personal blog written in MERN stack
 - Under development
