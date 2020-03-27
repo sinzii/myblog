@@ -1,0 +1,3 @@
+{
+    "mongooseUrl": "mongodb://localhost/myblog_tests"
+}
