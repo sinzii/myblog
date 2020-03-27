@@ -3,15 +3,15 @@ const Schema = mongoose.Schema;
 
 module.exports = function () {
     return {
-        createBy: {
+        createdBy: {
             type: Schema.Types.ObjectID,
             ref: 'User'
         },
-        createAt: Date,
-        updateBy: {
+        createdAt: Date,
+        updatedBy: {
             type: Schema.Types.ObjectID,
             ref: 'User'
         },
-        updateAt: Date
+        updatedAt: Date
     }
 };
