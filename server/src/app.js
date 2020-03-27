@@ -1,12 +1,14 @@
-let express = require('express');
-let logger = require('morgan');
-let cookieParser = require('cookie-parser');
-let mongoose = require('mongoose');
-let ResourceNotFoundException = require('./exceptions/404');
-let config = require('./config');
-// const debug = require('debug')('app');
+require('./bootstrap/logger');
+const express = require('express');
+const morgan = require('morgan');
+const cookieParser = require('cookie-parser');
+const mongoose = require('mongoose');
+const ResourceNotFoundException = require('./exceptions/404');
+const config = require('./config');
+const logger = require('log4js').getLogger('app');
 
-let app = express();
+logger.debug('Bootstrapping the app');
+const app = express();
 
 /*------------------------------------
     Customize express application
@@ -17,8 +19,8 @@ app.disable('x-powered-by');
 /*------------------------------------
     Setup logger
 ------------------------------------*/
-app.use(logger('dev')); // Http request logger
-// TODO setup logger
+app.use(morgan('dev')); // Http request logger
+
 
 /*------------------------------------
     Setup tools
@@ -49,7 +51,7 @@ require('./models');
 /*------------------------------------
     Setup endpoints
 ------------------------------------*/
-let apiV1 = require('./api/v1');
+const apiV1 = require('./api/v1');
 app.use('/api/v1', apiV1);
 
 app.get('/', (req, res) => {
@@ -86,12 +88,16 @@ app.use((err, req, res, next) => {
     }
 });
 
-// TODO disconnect mongodb connection on terminating Node process
+// TODO disconnect mongodb connection on terminating Node process + shutdown logger
 
 /*------------------------------------
     Start server
 ------------------------------------*/
-let port = config.httpPort || 3000;
+const port = config.httpPort || 3000;
 app.listen(port, function () {
-    console.log("Server started at port %s", port);
+    logger.info(`
+    --------------------------------------------------------
+    Server is started on port ${port} at ${new Date()} 
+    --------------------------------------------------------
+    `);
 });

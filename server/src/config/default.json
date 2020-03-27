@@ -1,4 +1,6 @@
 {
     "mongooseUrl": "YOUR_MONGO_PRODUCTION_URL",
-    "httpPort": 3000
+    "httpPort": 3000,
+    "logLevel": "INFO",
+    "logAppender": ["console", "dateFile"]
 }
