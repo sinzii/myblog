@@ -27,10 +27,12 @@ app.use(express.json()); // Allow parsing json object in request body
 app.use(express.urlencoded({extended: false})); // Allow parsing urlencoded in submitted body (FORM DATA)
 app.use(cookieParser()); // Parse cookies from request and save them to req.cookies
 
+// Load customizations
+require('./customization');
 /*------------------------------------
     Setup MongoDB
 ------------------------------------*/
-mongooseConfig = {
+const mongooseConfig = {
     useNewUrlParser: true,
     useCreateIndex: true,
     useUnifiedTopology: true
@@ -78,16 +80,18 @@ app.use((err, req, res, next) => {
             return res.send();
         }
     } else {
-        const message = "We're getting a problem, please comeback later.";
+        const message = "Oops! We're getting into a problem.";
 
-        return res.status(500).json({message})
+        return res.status(500).json({message});
     }
 });
+
+// TODO disconnect mongodb connection on terminating Node process
 
 /*------------------------------------
     Start server
 ------------------------------------*/
 let port = config.httpPort || 3000;
 app.listen(port, function () {
-    console.log("Server started at port %s", port)
+    console.log("Server started at port %s", port);
 });
