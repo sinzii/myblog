@@ -11,9 +11,9 @@ router.get('/', (req, res) => {
     res.json([
         {
             id: '1',
-            content: 'This is a secured post content'
-        }
-    ])
+            content: 'This is a secured post content',
+        },
+    ]);
 });
 
 /**
@@ -21,11 +21,11 @@ router.get('/', (req, res) => {
  */
 router.post('/', async (req, res, next) => {
     try {
-        const {body} = req;
+        const { body } = req;
         const name = body.name;
         if (name) {
             // TODO move this to pre-save hook
-            body.slug = String(body.name).trim().replace(/\s+/gm, '-')
+            body.slug = String(body.name).trim().replace(/\s+/gm, '-');
         }
 
         const newPost = new Post(req.body);
@@ -34,7 +34,6 @@ router.post('/', async (req, res, next) => {
         return res.status(201).send();
     } catch (e) {
         console.log(e.message);
-        return next(new InvalidSubmissionData())
+        return next(new InvalidSubmissionData());
     }
 });
-

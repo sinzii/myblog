@@ -16,7 +16,10 @@ class UserService {
      * }
      */
     async create(userDTO) {
-        await UserDTOSchema.CreateUserDTOSchema.doValidate(userDTO, {stripUnknown: true, abortEarly: false});
+        await UserDTOSchema.CreateUserDTOSchema.doValidate(userDTO, {
+            stripUnknown: true,
+            abortEarly: false,
+        });
         await this._addHashPassword(userDTO);
 
         const newUser = new User(userDTO);
@@ -34,7 +37,10 @@ class UserService {
      * }
      */
     async update(userId, userDTO) {
-        await UserDTOSchema.UpdateUserDTOSchema.doValidate(userDTO, {stripUnknown: true, abortEarly: false});
+        await UserDTOSchema.UpdateUserDTOSchema.doValidate(userDTO, {
+            stripUnknown: true,
+            abortEarly: false,
+        });
 
         const targetUser = await this.findOne(userId);
 
@@ -42,7 +48,7 @@ class UserService {
         // todo check if password is the same with current password
 
         return await targetUser.updateOne({
-            $set: userDTO
+            $set: userDTO,
         });
     }
 
@@ -57,7 +63,7 @@ class UserService {
 
     async updatePassword(userId, newPassword) {
         const targetUser = await this.findOne(userId);
-        const {passwordHash, salt} = this.hashingPassword(newPassword);
+        const { passwordHash, salt } = this.hashingPassword(newPassword);
         targetUser.passwordHash = passwordHash;
         targetUser.salt = salt;
 
@@ -71,27 +77,26 @@ class UserService {
 
         function hashing() {
             return new Promise((resolve, reject) => {
-                crypto.pbkdf2(rawPassword, salt, 10000, 100, 'sha512',
-                    function (err, derivedKey) {
-                        if (err) {
-                            reject(err);
-                        } else {
-                            resolve(derivedKey.toString('hex'));
-                        }
-                    })
-            })
+                crypto.pbkdf2(rawPassword, salt, 10000, 100, 'sha512', function (err, derivedKey) {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        resolve(derivedKey.toString('hex'));
+                    }
+                });
+            });
         }
 
         const passwordHash = await hashing();
 
         return {
             passwordHash,
-            salt
-        }
+            salt,
+        };
     }
 
     async isValidPassword(user, rawPasswordToCheck) {
-        const {passwordHash} = await this.hashingPassword(rawPasswordToCheck, user.salt);
+        const { passwordHash } = await this.hashingPassword(rawPasswordToCheck, user.salt);
         return user.passwordHash === passwordHash;
     }
 
@@ -107,12 +112,11 @@ class UserService {
         return await targetUser.save();
     }
 
-    async findAll(searchQuery, offset = 0, limit = 10) {
-    }
+    async findAll(searchQuery, offset = 0, limit = 10) {}
 
     async findOne(userId, throwError = true) {
         try {
-            return await User.findById(userId)
+            return await User.findById(userId);
         } catch {
             if (throwError) {
                 throw new ResourceNotFoundError('User is not existed');

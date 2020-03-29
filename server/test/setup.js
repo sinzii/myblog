@@ -8,7 +8,7 @@ before(async () => {
     const mongooseConfig = {
         useNewUrlParser: true,
         useCreateIndex: true,
-        useUnifiedTopology: true
+        useUnifiedTopology: true,
     };
 
     mongoose.connect(config.mongooseUrl, mongooseConfig);

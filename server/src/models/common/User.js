@@ -8,25 +8,25 @@ const UserSchema = new mongoose.Schema(
             username: {
                 type: String,
                 unique: true,
-                required: true
+                required: true,
             },
             email: {
                 type: String,
                 unique: true,
-                required: true
+                required: true,
             },
             passwordHash: String,
             salt: String,
             avatar: String,
             active: {
                 type: Boolean,
-                default: true
-            }
+                default: true,
+            },
         },
         auditableProps
     ),
     {
-        timestamps: true
+        timestamps: true,
     }
 );
 

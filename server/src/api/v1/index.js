@@ -21,5 +21,3 @@ const authentication = (req, res, next) => {
 
 router.use('/public', publicRouter);
 router.use('/secure', authentication, secureRouter);
-
-

@@ -5,13 +5,13 @@ module.exports = function () {
     return {
         createdBy: {
             type: Schema.Types.ObjectID,
-            ref: 'User'
+            ref: 'User',
         },
         createdAt: Date,
         updatedBy: {
             type: Schema.Types.ObjectID,
-            ref: 'User'
+            ref: 'User',
         },
-        updatedAt: Date
-    }
+        updatedAt: Date,
+    };
 };

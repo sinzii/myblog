@@ -8,18 +8,18 @@ const CommentSchema = new Schema(
             post: {
                 type: Schema.ObjectID,
                 ref: 'Post',
-                required: true
+                required: true,
             },
             content: String,
             active: {
                 type: Boolean,
-                default: true
-            }
+                default: true,
+            },
         },
         auditableProps
     ),
     {
-        timestamps: true
+        timestamps: true,
     }
 );
 

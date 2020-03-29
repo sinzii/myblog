@@ -7,7 +7,7 @@ class NotAuthorized extends HttpResponseError {
 
     handleError(req, res) {
         res.header('WWW-Authenticate', 'Bearer realm="Alpha Secure API"');
-        return res.status(this.status).json({message: this.message});
+        return res.status(this.status).json({ message: this.message });
     }
 }
 

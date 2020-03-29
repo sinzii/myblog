@@ -21,12 +21,11 @@ app.disable('x-powered-by');
 ------------------------------------*/
 app.use(morgan('dev')); // Http request logger
 
-
 /*------------------------------------
     Setup tools
 ------------------------------------*/
 app.use(express.json()); // Allow parsing json object in request body
-app.use(express.urlencoded({extended: false})); // Allow parsing urlencoded in submitted body (FORM DATA)
+app.use(express.urlencoded({ extended: false })); // Allow parsing urlencoded in submitted body (FORM DATA)
 app.use(cookieParser()); // Parse cookies from request and save them to req.cookies
 
 // Load customizations
@@ -37,7 +36,7 @@ require('./customization');
 const mongooseConfig = {
     useNewUrlParser: true,
     useCreateIndex: true,
-    useUnifiedTopology: true
+    useUnifiedTopology: true,
 };
 
 mongoose.connect(config.mongooseUrl, mongooseConfig);
@@ -55,7 +54,7 @@ const apiV1 = require('./api/v1');
 app.use('/api/v1', apiV1);
 
 app.get('/', (req, res) => {
-    res.json({message: "Welcome to Project Alpha API"});
+    res.json({ message: 'Welcome to Project Alpha API' });
 });
 
 /*------------------------------------
@@ -70,21 +69,21 @@ app.use((err, req, res, next) => {
         return err.handleError(req, res);
     }
 
-    const {status} = err;
+    const { status } = err;
 
     if (status) {
         res.status(status);
 
-        const {message} = err;
+        const { message } = err;
         if (message) {
-            return res.json({message});
+            return res.json({ message });
         } else {
             return res.send();
         }
     } else {
         const message = "Oops! We're getting into a problem.";
 
-        return res.status(500).json({message});
+        return res.status(500).json({ message });
     }
 });
 

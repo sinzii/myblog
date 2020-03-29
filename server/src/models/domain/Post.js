@@ -7,47 +7,47 @@ const PostSchema = new Schema(
         {
             name: {
                 type: String,
-                required: true
+                required: true,
             },
             slug: {
                 type: String,
                 unique: true,
                 required: true,
                 lowercase: true,
-                trim: true
+                trim: true,
             },
             content: String,
             active: {
                 type: Boolean,
-                default: true
+                default: true,
             },
             official: Boolean,
             status: {
                 type: String,
                 enum: ['draft', 'private', 'public'],
                 default: 'draft',
-                required: true
+                required: true,
             },
             meta: {
                 view_counter: {
                     type: Number,
-                    default: 0
+                    default: 0,
                 },
                 like_counter: {
                     type: Number,
-                    default: 0
-                }
-            }
+                    default: 0,
+                },
+            },
         },
         auditableProps
     ),
     {
-        timestamps: true
+        timestamps: true,
     }
 );
 
 PostSchema.methods.sayHello = function () {
-    console.log("Hello world, I'm %s", this.name)
+    console.log("Hello world, I'm %s", this.name);
 };
 
 mongoose.model('Post', PostSchema);

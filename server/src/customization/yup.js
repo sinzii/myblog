@@ -9,8 +9,8 @@ yub.object.prototype.doValidate = async function (dataToValidate, options) {
         let errors = null;
         if (e instanceof ValidationError) {
             errors = e.inner.reduce((_errors, one) => {
-               _errors[one.path] = one.message;
-               return _errors;
+                _errors[one.path] = one.message;
+                return _errors;
             }, {});
         }
 
