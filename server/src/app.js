@@ -3,7 +3,7 @@ const express = require('express');
 const morgan = require('morgan');
 const cookieParser = require('cookie-parser');
 const mongoose = require('mongoose');
-const ResourceNotFoundException = require('./exceptions/404');
+const ResourceNotFoundError = require('./exceptions/404Error');
 const config = require('./config');
 const logger = require('log4js').getLogger('app');
 
@@ -61,7 +61,7 @@ app.get('/', (req, res) => {
     Handle errors
 ------------------------------------*/
 app.use((req, res, next) => {
-    next(new ResourceNotFoundException());
+    next(new ResourceNotFoundError());
 });
 
 app.use((err, req, res, next) => {

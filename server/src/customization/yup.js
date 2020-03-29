@@ -1,6 +1,6 @@
 const yub = require('yup');
 const ValidationError = yub.ValidationError;
-const InvalidSubmissionDataError = require('../exceptions/InvalidSubmissionData');
+const InvalidSubmissionDataError = require('../exceptions/InvalidSubmissionDataError');
 
 yub.object.prototype.doValidate = async function (dataToValidate, options) {
     try {

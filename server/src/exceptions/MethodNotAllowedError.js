@@ -1,9 +1,9 @@
 const HttpResponseError = require('./HttpRequestError');
 
-class MethodNotAllowed extends HttpResponseError {
+class MethodNotAllowedError extends HttpResponseError {
     constructor() {
         super(405); // Method Not Allowed
     }
 }
 
-module.exports = MethodNotAllowed;
+module.exports = MethodNotAllowedError;

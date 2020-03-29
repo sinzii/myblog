@@ -1,4 +1,4 @@
-const NotAuthorized = require('../../exceptions/NotAuthorized');
+const NotAuthorizedError = require('../../exceptions/NotAuthorizedError');
 
 let router = require('express').Router();
 let publicRouter = require('./public');
@@ -16,7 +16,7 @@ const authentication = (req, res, next) => {
             return next();
         }
     }
-    return next(new NotAuthorized());
+    return next(new NotAuthorizedError());
 };
 
 router.use('/public', publicRouter);

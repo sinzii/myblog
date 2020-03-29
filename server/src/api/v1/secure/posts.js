@@ -1,4 +1,4 @@
-const InvalidSubmissionData = require('../../../exceptions/InvalidSubmissionData');
+const InvalidSubmissionDataError = require('../../../exceptions/InvalidSubmissionDataError');
 const mongoose = require('mongoose');
 const Post = mongoose.model('Post');
 
@@ -34,6 +34,6 @@ router.post('/', async (req, res, next) => {
         return res.status(201).send();
     } catch (e) {
         console.log(e.message);
-        return next(new InvalidSubmissionData());
+        return next(new InvalidSubmissionDataError());
     }
 });

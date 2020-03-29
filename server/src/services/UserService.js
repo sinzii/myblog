@@ -2,8 +2,8 @@ const crypto = require('crypto');
 const mongoose = require('mongoose');
 const User = mongoose.model('User');
 const UserDTOSchema = require('../validations/UserDTO');
-const ResourceNotFoundError = require('../exceptions/404');
-const InvalidSubmissionDataError = require('../exceptions/InvalidSubmissionData');
+const ResourceNotFoundError = require('../exceptions/404Error');
+const InvalidSubmissionDataError = require('../exceptions/InvalidSubmissionDataError');
 
 class UserService {
     /**

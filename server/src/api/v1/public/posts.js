@@ -1,6 +1,6 @@
 const router = require('express').Router();
-const ResourceNotFound = require('../../../exceptions/404');
-const MethodNotAllowed = require('../../../exceptions/MethodNotAllowed');
+const ResourceNotFoundError = require('../../../exceptions/404Error');
+const MethodNotAllowedError = require('../../../exceptions/MethodNotAllowedError');
 const mongoose = require('mongoose');
 const Post = mongoose.model('Post');
 
@@ -15,7 +15,7 @@ router.get('/', async (req, res) => {
 });
 
 router.all('/', (req, res, next) => {
-    next(new MethodNotAllowed());
+    next(new MethodNotAllowedError());
 });
 
 /**
@@ -33,5 +33,5 @@ router.get('/:postId', async (req, res, next) => {
         // What is this??
     }
 
-    next(new ResourceNotFound('Post not found'));
+    next(new ResourceNotFoundError('Post not found'));
 });
