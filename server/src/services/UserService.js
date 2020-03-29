@@ -36,14 +36,10 @@ class UserService {
     async update(userId, userDTO) {
         await UserDTOSchema.UpdateUserDTOSchema.doValidate(userDTO, {stripUnknown: true, abortEarly: false});
 
-        const targetUser = User.findById(userId);
-        if (!targetUser) {
-            throw new ResourceNotFoundError('User is not existed');
-        }
+        const targetUser = await this.findOne(userId);
 
         await this._addHashPassword(userDTO);
-
-        // check if password is the same with current password
+        // todo check if password is the same with current password
 
         return await targetUser.updateOne({
             $set: userDTO
@@ -114,8 +110,16 @@ class UserService {
     async findAll(searchQuery, offset = 0, limit = 10) {
     }
 
-    async findOne(userId) {
-        return await User.findById(userId)
+    async findOne(userId, throwError = true) {
+        try {
+            return await User.findById(userId)
+        } catch {
+            if (throwError) {
+                throw new ResourceNotFoundError('User is not existed');
+            }
+        }
+
+        return null;
     }
 }
 
