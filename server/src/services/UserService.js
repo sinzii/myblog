@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const User = mongoose.model('User');
 const UserDTOSchema = require('../validations/UserDTO');
 const ResourceNotFoundError = require('../exceptions/404');
+const InvalidSubmissionDataError = require('../exceptions/InvalidSubmissionData');
 
 class UserService {
     /**
@@ -33,6 +34,7 @@ class UserService {
      *     name: 'First Last',
      *     username: 'an_unique_name',
      *     email: 'an_unique_email',
+     *     password: 'password_to_change',
      *     avatar: 'https://path/to/avatar_image'
      * }
      */
@@ -44,20 +46,29 @@ class UserService {
 
         const targetUser = await this.findOne(userId);
 
-        await this._addHashPassword(userDTO);
-        // todo check if password is the same with current password
+        await this._addHashPassword(userDTO, targetUser.salt);
+        if (targetUser.passwordHash === userDTO.passwordHash) {
+            throw new InvalidSubmissionDataError(undefined, {
+                password: 'Please use a new password for your security',
+            });
+        }
 
-        return await targetUser.updateOne({
-            $set: userDTO,
-        });
+        await targetUser.updateOne(
+            {
+                $set: userDTO,
+            },
+            { runValidators: true }
+        );
+
+        return await this.findOne(userId);
     }
 
-    async _addHashPassword(userDTO) {
+    async _addHashPassword(userDTO, currentSalt) {
         if (!userDTO.password) {
             return;
         }
 
-        Object.assign(userDTO, await this.hashingPassword(userDTO.password));
+        Object.assign(userDTO, await this.hashingPassword(userDTO.password, currentSalt));
         delete userDTO.password;
     }
 

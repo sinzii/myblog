@@ -2,12 +2,12 @@ const mongoose = require('mongoose');
 const assert = require('chai').assert;
 
 describe('Test UserService', () => {
-    before(async function () {
+    beforeEach(async function () {
         const User = mongoose.model('User');
         await User.deleteMany();
     });
 
-    after(async () => {
+    afterEach(async function () {
         const User = mongoose.model('User');
         await User.deleteMany();
     });
@@ -72,4 +72,73 @@ describe('Test UserService', () => {
             }
         });
     });
+
+    describe('Update user', () => {
+        let newUser;
+
+        beforeEach(async function () {
+            const toCreateUserDTO = {
+                name: 'Thang X. Vu',
+                username: 'sinzii',
+                email: 'helloworld@email.com',
+                password: 'qweqwe123',
+            };
+
+            const UserService = require('../../src/services/UserService');
+            newUser = await UserService.create(toCreateUserDTO);
+        });
+
+        it('Update user name successful', async () => {
+            const toUpdateUserDTO = {
+                name: 'Hello World',
+            };
+
+            const UserService = require('../../src/services/UserService');
+            const updatedUser = await UserService.update(newUser._id, toUpdateUserDTO);
+            assert.equal(updatedUser.name, 'Hello World');
+        });
+
+        it('Should not update user using the same password', async () => {
+            const toUpdateUserDTO = {
+                password: 'qweqwe123',
+            };
+
+            try {
+                const UserService = require('../../src/services/UserService');
+                await UserService.update(newUser._id, toUpdateUserDTO);
+            } catch (e) {
+                assert.equal(e.constructor.name, 'InvalidSubmissionData');
+                assert.equal(e.data.password, 'Please use a new password for your security');
+                return;
+            }
+
+            assert.fail('Should throw InvalidSubmissionData error');
+        });
+
+        it('Not found target user to update', async () => {
+            try {
+                const UserService = require('../../src/services/UserService');
+                await UserService.update('123123123', {});
+            } catch (e) {
+                assert.equal(e.constructor.name, 'ResourceNotFound');
+                return;
+            }
+
+            assert.fail('Should throw ResourceNotFound error');
+        });
+    });
+
+    describe('Update password', () => {});
+
+    describe('Hashing password', () => {});
+
+    describe('Check valid password', () => {});
+
+    describe('Activate user', () => {});
+
+    describe('Deactivate user', () => {});
+
+    describe('Find all users', () => {});
+
+    describe('Find one user', () => {});
 });
