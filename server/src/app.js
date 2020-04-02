@@ -48,6 +48,33 @@ if (config.dev_mode) {
 require('./models');
 
 /*------------------------------------
+    Init Default Data
+------------------------------------*/
+const UserService = require('./services/UserService');
+async function hasAnyUsers() {
+    const first10Users = await UserService.findAll();
+    return first10Users.length;
+}
+
+async function createDefaultUsers() {
+    if (await hasAnyUsers()) {
+        return;
+    }
+
+    const adminUser = config.adminUser;
+    if (!adminUser.name) {
+        adminUser.name = 'Boss';
+    }
+
+    await UserService.create(adminUser);
+    logger.info('Default admin user has been created');
+}
+
+createDefaultUsers().catch((e) => {
+    logger.error('Error while creating default user', e);
+});
+
+/*------------------------------------
     Setup endpoints
 ------------------------------------*/
 const apiV1 = require('./api/v1');

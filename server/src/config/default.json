@@ -2,5 +2,10 @@
     "mongooseUrl": "YOUR_MONGO_PRODUCTION_URL",
     "httpPort": 3000,
     "logLevel": "INFO",
-    "logAppender": ["console", "dateFile"]
+    "logAppender": ["console", "dateFile"],
+    "adminUser": {
+        "username": "YOUR_ADMIN_USERNAME",
+        "email": "YOUR_ADMIN_EMAIL",
+        "password": "YOUR_ADMIN_PASSWORD"
+    }
 }

@@ -111,3 +111,4 @@ temp/
 # End of https://www.gitignore.io/api/node
 .idea/
 server/src/config/dev.json
+server/src/config/prod.json
