@@ -123,7 +123,37 @@ class UserService {
         return await targetUser.save();
     }
 
-    async findAll(searchQuery, offset = 0, limit = 10) {}
+    async findAll(searchQuery, offset = 0, limit = 10) {
+        let userFilterConditions = {};
+        if (searchQuery) {
+            searchQuery = String(searchQuery).replace(/[-[\]{}()*+?.,\\/^$|#\s]/g, '\\$&');
+            userFilterConditions = {
+                $or: [
+                    {
+                        name: {
+                            $regex: searchQuery,
+                        },
+                    },
+                    {
+                        username: {
+                            $regex: searchQuery,
+                        },
+                    },
+                    {
+                        email: {
+                            $regex: searchQuery,
+                        },
+                    },
+                ],
+            };
+        }
+
+        return await User.find(userFilterConditions)
+            .skip(offset)
+            .limit(limit)
+            .sort({ createdAt: -1 })
+            .exec();
+    }
 
     async findOne(userId, throwError = true) {
         try {

@@ -4,7 +4,10 @@ const auditableProps = require('../auditable')();
 const UserSchema = new mongoose.Schema(
     Object.assign(
         {
-            name: String,
+            name: {
+                type: String,
+                index: true,
+            },
             username: {
                 type: String,
                 unique: true,
