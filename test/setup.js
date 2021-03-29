@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const config = require('./config_tests');
+const config = require('./config_tests.json');
 
 before(async () => {
     require('../src/customization');

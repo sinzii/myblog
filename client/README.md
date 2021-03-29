@@ -1,1 +1,0 @@
-# MyBlog client written in ReactJS

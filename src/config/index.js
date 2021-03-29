@@ -1,4 +1,4 @@
-const defaultConfig = require('./default');
+const defaultConfig = require('./default.json');
 
 const prodMode = process.env.NODE_ENV === 'production';
 
