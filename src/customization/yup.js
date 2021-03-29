@@ -1,4 +1,4 @@
-const yub = require('src/customization/yup');
+const yub = require('yup');
 const ValidationError = yub.ValidationError;
 const InvalidSubmissionDataError = require('../exceptions/InvalidSubmissionDataError');
 
