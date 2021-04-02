@@ -1,8 +1,8 @@
 const router = require('express').Router();
 const ResourceNotFoundError = require('../../../exceptions/404Error');
-const MethodNotAllowedError = require('../../../exceptions/MethodNotAllowedError');
 const mongoose = require('mongoose');
 const Post = mongoose.model('Post');
+const validator = require('validator');
 
 module.exports = router;
 
@@ -10,12 +10,24 @@ module.exports = router;
  * Get all official posts
  */
 router.get('/', async (req, res) => {
-    const posts = await Post.find({ official: true });
-    return res.json(posts);
-});
+    let { limit, startingAfter, endingBefore } = req.query;
 
-router.all('/', (req, res, next) => {
-    next(new MethodNotAllowedError());
+    limit = validator.isNumeric(limit) ? Number(limit) : 10;
+    limit = limit > 100 || limit <= 0 ? 10 : limit;
+
+    let conditions = { official: true };
+    if (startingAfter) {
+        conditions._id = {
+            $gt: startingAfter
+        };
+    } else if (endingBefore) {
+        conditions._id = {
+            $lt: endingBefore
+        };
+    }
+
+    const posts = await Post.find(conditions).sort({ _id: 1 }).limit(limit);
+    return res.json(posts);
 });
 
 /**
@@ -30,7 +42,9 @@ router.get('/:postId', async (req, res, next) => {
             return res.json(targetPost);
         }
     } catch (e) {
-        // What is this??
+        console.log(e);
+        next(e);
+        return;
     }
 
     next(new ResourceNotFoundError('Post not found'));

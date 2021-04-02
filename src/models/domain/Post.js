@@ -16,7 +16,10 @@ const PostSchema = new Schema(
                 lowercase: true,
                 trim: true,
             },
-            content: String,
+            content: {
+                type: String,
+                default: ''
+            },
             active: {
                 type: Boolean,
                 default: true,
@@ -28,16 +31,10 @@ const PostSchema = new Schema(
                 default: 'draft',
                 required: true,
             },
-            meta: {
-                view_counter: {
-                    type: Number,
-                    default: 0,
-                },
-                like_counter: {
-                    type: Number,
-                    default: 0,
-                },
-            },
+            viewsCounter: {
+                type: Number,
+                default: 0,
+            }
         },
         auditableProps
     ),
