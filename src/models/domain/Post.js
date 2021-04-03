@@ -2,6 +2,8 @@ const mongoose = require('mongoose');
 const auditableProps = require('../auditable')();
 const Schema = mongoose.Schema;
 
+const PostStatuses = ['draft', 'public'];
+
 const PostSchema = new Schema(
     Object.assign(
         {
@@ -27,7 +29,7 @@ const PostSchema = new Schema(
             official: Boolean,
             status: {
                 type: String,
-                enum: ['draft', 'private', 'public'],
+                enum: PostStatuses,
                 default: 'draft',
                 required: true,
             },
@@ -43,8 +45,9 @@ const PostSchema = new Schema(
     }
 );
 
-PostSchema.methods.sayHello = function () {
-    console.log("Hello world, I'm %s", this.name);
-};
-
 mongoose.model('Post', PostSchema);
+
+module.exports = {
+    PostSchema,
+    PostStatuses
+}

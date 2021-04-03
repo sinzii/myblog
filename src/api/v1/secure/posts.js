@@ -1,4 +1,6 @@
 const InvalidSubmissionDataError = require('../../../exceptions/InvalidSubmissionDataError');
+const exceptionHandler = require('../../../utils/request').exceptionHandler;
+const PostService = require('../../../services/PostService');
 const mongoose = require('mongoose');
 const Post = mongoose.model('Post');
 
@@ -7,14 +9,13 @@ const router = express.Router();
 
 module.exports = router;
 
-router.get('/', (req, res) => {
-    res.json([
-        {
-            id: '1',
-            content: 'This is a secured post content',
-        },
-    ]);
-});
+/**
+ * Get all active posts by defaults
+ */
+router.get('/', exceptionHandler(async (req, res) => {
+    const posts = await PostService.findAll(req.query);
+    return res.json(posts);
+}));
 
 /**
  * Create a new post
