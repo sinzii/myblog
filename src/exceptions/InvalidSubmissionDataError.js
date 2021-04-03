@@ -1,4 +1,4 @@
-const HttpResponseError = require('./HttpRequestError');
+const HttpResponseError = require('./HttpResponseError');
 
 class InvalidSubmissionDataError extends HttpResponseError {
     constructor(message = 'Invalid submission data', data) {

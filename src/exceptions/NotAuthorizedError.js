@@ -1,4 +1,4 @@
-const HttpResponseError = require('./HttpRequestError');
+const HttpResponseError = require('./HttpResponseError');
 
 class NotAuthorizedError extends HttpResponseError {
     constructor(message = 'Not authorized') {

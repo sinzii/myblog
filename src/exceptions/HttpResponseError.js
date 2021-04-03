@@ -1,4 +1,4 @@
-class HttpRequestError extends Error {
+class HttpResponseError extends Error {
     constructor(status, message) {
         super();
         if (!status) {
@@ -10,4 +10,4 @@ class HttpRequestError extends Error {
     }
 }
 
-module.exports = HttpRequestError;
+module.exports = HttpResponseError;

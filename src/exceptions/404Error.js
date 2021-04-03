@@ -1,4 +1,4 @@
-const HttpResponseError = require('./HttpRequestError');
+const HttpResponseError = require('./HttpResponseError');
 
 class ResourceNotFoundError extends HttpResponseError {
     constructor(message = "Seem you're lost!") {
