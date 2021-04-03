@@ -1,6 +1,7 @@
 const router = require('express').Router();
 const PostService = require('../../../services/PostService');
 const exceptionHandler = require('../../../utils/request').exceptionHandler;
+const ResourceNotFoundError = require('../../../exceptions/404Error');
 
 module.exports = router;
 
@@ -19,8 +20,13 @@ router.get('/', exceptionHandler(async (req, res) => {
 /**
  * Get a specific post
  */
-router.get('/:postId', exceptionHandler(async (req, res) => {
+router.get('/:postId', exceptionHandler(async (req, res, next) => {
     const { postId } = req.params;
     const post = await PostService.findOne(postId);
-    return res.json(post);
+
+    if (post.isOfficial()) {
+        return res.json(post);
+    }
+
+    next(new ResourceNotFoundError('Post is not existed'));
 }));

@@ -26,7 +26,10 @@ const PostSchema = new Schema(
                 type: Boolean,
                 default: true,
             },
-            official: Boolean,
+            official: {
+                type: Boolean,
+                default: false
+            },
             status: {
                 type: String,
                 enum: PostStatuses,
@@ -44,6 +47,10 @@ const PostSchema = new Schema(
         timestamps: true,
     }
 );
+
+PostSchema.methods.isOfficial = () => {
+    return this.official && this.active && this.status === 'public';
+}
 
 mongoose.model('Post', PostSchema);
 
