@@ -5,6 +5,10 @@ class InvalidSubmissionDataError extends HttpResponseError {
         super(406, message); // Not acceptable
         this.data = data;
     }
+
+    handleError(req, res) {
+        return res.status(this.status).json({ message: this.message, errors: this.data });
+    }
 }
 
 module.exports = InvalidSubmissionDataError;

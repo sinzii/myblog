@@ -1,8 +1,5 @@
-const InvalidSubmissionDataError = require('../../../exceptions/InvalidSubmissionDataError');
 const exceptionHandler = require('../../../utils/request').exceptionHandler;
 const PostService = require('../../../services/PostService');
-const mongoose = require('mongoose');
-const Post = mongoose.model('Post');
 
 const express = require('express');
 const router = express.Router();
@@ -18,23 +15,30 @@ router.get('/', exceptionHandler(async (req, res) => {
 }));
 
 /**
+ * Get a post
+ */
+router.get('/:postId', exceptionHandler(async (req, res, next) => {
+    const { postId } = req.params;
+
+    // TODO update post permissions
+
+    const post = await PostService.findOne(postId);
+    return res.json(post);
+}));
+
+/**
  * Create a new post
  */
-router.post('/', async (req, res, next) => {
-    try {
-        const { body } = req;
-        const name = body.name;
-        if (name) {
-            // TODO move this to pre-save hook
-            body.slug = String(body.name).trim().replace(/\s+/gm, '-');
-        }
+router.post('/', exceptionHandler(async (req, res, next) => {
+    const post = await PostService.create(req.body);
+    return res.json(post);
+}));
 
-        const newPost = new Post(req.body);
-        await newPost.save();
-
-        return res.status(201).send();
-    } catch (e) {
-        console.log(e.message);
-        return next(new InvalidSubmissionDataError());
-    }
-});
+/**
+ * Update a post
+ */
+router.put('/:postId', exceptionHandler(async (req, res, next) => {
+    const { postId } = req.params;
+    const targetPost = await PostService.update(postId, req.body);
+    return res.json(targetPost);
+}));

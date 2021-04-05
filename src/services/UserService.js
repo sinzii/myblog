@@ -17,7 +17,7 @@ class UserService {
      * }
      */
     async create(userDTO) {
-        await UserDTOSchema.CreateUserDTOSchema.doValidate(userDTO, {
+        userDTO = await UserDTOSchema.CreateUserDTOSchema.doValidate(userDTO, {
             stripUnknown: true,
             abortEarly: false,
         });
@@ -39,7 +39,7 @@ class UserService {
      * }
      */
     async update(userId, userDTO) {
-        await UserDTOSchema.UpdateUserDTOSchema.doValidate(userDTO, {
+        userDTO = await UserDTOSchema.UpdateUserDTOSchema.doValidate(userDTO, {
             stripUnknown: true,
             abortEarly: false,
         });
@@ -57,7 +57,9 @@ class UserService {
             {
                 $set: userDTO,
             },
-            { runValidators: true }
+            {
+                runValidators: true
+            }
         );
 
         return await this.findOne(userId);
