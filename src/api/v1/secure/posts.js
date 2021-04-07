@@ -1,10 +1,13 @@
 const exceptionHandler = require('../../../utils/request').exceptionHandler;
+const checkValidId = require('../../../utils/request').checkValidId;
 const PostService = require('../../../services/PostService');
 
 const express = require('express');
 const router = express.Router();
 
 module.exports = router;
+
+router.param('id', checkValidId);
 
 /**
  * Get all active posts by defaults
@@ -17,12 +20,9 @@ router.get('/', exceptionHandler(async (req, res) => {
 /**
  * Get a post
  */
-router.get('/:postId', exceptionHandler(async (req, res, next) => {
-    const { postId } = req.params;
-
-    // TODO update post permissions
-
-    const post = await PostService.findOne(postId);
+router.get('/:id', exceptionHandler(async (req, res, next) => {
+    const { id } = req.params;
+    const post = await PostService.findOne(id);
     return res.json(post);
 }));
 
@@ -37,8 +37,8 @@ router.post('/', exceptionHandler(async (req, res, next) => {
 /**
  * Update a post
  */
-router.put('/:postId', exceptionHandler(async (req, res, next) => {
-    const { postId } = req.params;
-    const targetPost = await PostService.update(postId, req.body);
+router.put('/:id', exceptionHandler(async (req, res, next) => {
+    const { id } = req.params;
+    const targetPost = await PostService.update(id, req.body);
     return res.json(targetPost);
 }));

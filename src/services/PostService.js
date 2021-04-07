@@ -2,18 +2,20 @@ const validator = require('validator');
 const mongoose = require('mongoose');
 const Post = mongoose.model('Post');
 const PostStatuses = require('../models/domain/Post').PostStatuses;
-const ResourceNotFound = require('../exceptions/404Error');
+const ResourceNotFoundError = require('../exceptions/404Error');
 const PostValidation = require('../validations/post');
 const InvalidSubmissionDataError = require('../exceptions/InvalidSubmissionDataError');
 
 class PostService {
     async findOne(id, throwError = true) {
-        try {
-            return await Post.findById(id);
-        } catch (e) {
-            if (throwError) {
-                throw new ResourceNotFound('Post is not existed');
-            }
+        const post = await Post.findById(id);
+
+        if (post) {
+            return post;
+        }
+
+        if (throwError) {
+            throw new ResourceNotFoundError('Post is not existed');
         }
 
         return null;
@@ -127,6 +129,22 @@ class PostService {
         }
 
         return targetPost;
+    }
+
+    async delete(postId) {
+        const result = await Post.deleteOne({ _id: postId });
+
+        if (result.deletedCount === 0) {
+            throw new ResourceNotFoundError('Post is not existed');
+        }
+    }
+
+    async publish(postId) {
+
+    }
+
+    async officialize(postId, status = true) {
+
     }
 }
 

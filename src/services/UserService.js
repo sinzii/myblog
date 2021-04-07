@@ -158,12 +158,13 @@ class UserService {
     }
 
     async findOne(userId, throwError = true) {
-        try {
-            return await User.findById(userId);
-        } catch {
-            if (throwError) {
-                throw new ResourceNotFoundError('User is not existed');
-            }
+        const user = await User.findById(userId);
+        if (user) {
+            return user;
+        }
+
+        if (throwError) {
+            throw new ResourceNotFoundError('User is not existed');
         }
 
         return null;
