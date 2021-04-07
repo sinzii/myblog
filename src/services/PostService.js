@@ -5,6 +5,7 @@ const PostStatuses = require('../models/domain/Post').PostStatuses;
 const ResourceNotFoundError = require('../exceptions/404Error');
 const PostValidation = require('../validations/post');
 const InvalidSubmissionDataError = require('../exceptions/InvalidSubmissionDataError');
+const ActionNotAcceptableError = require('../exceptions/ActionNotAcceptableError');
 
 class PostService {
     async findOne(id, throwError = true) {
@@ -140,11 +141,47 @@ class PostService {
     }
 
     async publish(postId) {
+        const post = await this.findOne(postId);
+        if (post.status === 'public') {
+            return;
+        }
 
+        await post.updateOne(
+            {
+                $set: {
+                    status: 'public'
+                }
+            },
+            {
+                runValidators: true
+            }
+        );
     }
 
-    async officialize(postId, status = true) {
+    async officialize(postId, official = true) {
+        if (typeof official === 'string') {
+            official = validator.toBoolean(official);
+        }
 
+        const post = await this.findOne(postId);
+        if (post.official === official) {
+            return;
+        }
+
+        if (official && post.status !== 'public') {
+            throw new ActionNotAcceptableError('Could not officialize drafted post');
+        }
+
+        await post.updateOne(
+            {
+                $set: {
+                    official
+                }
+            },
+            {
+                runValidators: true
+            }
+        );
     }
 }
 

@@ -42,3 +42,39 @@ router.put('/:id', exceptionHandler(async (req, res, next) => {
     const targetPost = await PostService.update(id, req.body);
     return res.json(targetPost);
 }));
+
+/**
+ * Delete a post
+ */
+router.delete('/:id', exceptionHandler(async (req, res, next) => {
+    const { id } = req.params;
+    await PostService.delete(id);
+    return res.status(204).send();
+}));
+
+/**
+ * Publish a post
+ */
+router.put('/:id/publish', exceptionHandler(async (req, res, next) => {
+    const { id } = req.params;
+    await PostService.publish(id);
+    return res.status(204).send();
+}));
+
+/**
+ * Officialize a post
+ */
+router.put('/:id/officialize', exceptionHandler(async (req, res, next) => {
+    let { id } = req.params;
+    await PostService.officialize(id, true);
+    return res.status(204).send();
+}));
+
+/**
+ * Un-officialize a post
+ */
+router.put('/:id/unofficialize', exceptionHandler(async (req, res, next) => {
+    let { id } = req.params;
+    await PostService.officialize(id, false);
+    return res.status(204).send();
+}));
