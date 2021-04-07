@@ -1,5 +1,4 @@
-const exceptionHandler = require('../../../utils/request').exceptionHandler;
-const checkValidId = require('../../../utils/request').checkValidId;
+const { exceptionHandler, checkValidId } = require('../../../utils/request');
 const PostService = require('../../../services/PostService');
 
 const express = require('express');

@@ -10,7 +10,6 @@ function exceptionHandler(requestHandler) {
         try {
             await requestHandler(req, res, next);
         } catch (e) {
-            console.log('exceptionHandler', e);
             next(e);
         }
     }

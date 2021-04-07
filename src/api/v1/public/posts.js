@@ -1,7 +1,6 @@
 const router = require('express').Router();
 const PostService = require('../../../services/PostService');
-const exceptionHandler = require('../../../utils/request').exceptionHandler;
-const checkValidId = require('../../../utils/request').checkValidId;
+const { exceptionHandler, checkValidId } = require('../../../utils/request');
 const ResourceNotFoundError = require('../../../exceptions/404Error');
 
 module.exports = router;
