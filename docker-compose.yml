@@ -10,7 +10,8 @@ services:
     image: node:12-alpine
     command: sh -c "npm run dev"
     ports:
-      - 3000:3000
+      - 3000:3000  # application port
+      - 9229:9229  # debug port
     working_dir: /app
     volumes:
       - ./:/app
