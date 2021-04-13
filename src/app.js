@@ -55,7 +55,7 @@ async function bootstrapping() {
     const UserService = require('./services/UserService');
 
     async function hasAnyUsers() {
-        const first10Users = await UserService.findAll();
+        const first10Users = await UserService.findAll({});
         return first10Users.length;
     }
 

@@ -3,9 +3,10 @@ const mongoose = require('mongoose');
 const Post = mongoose.model('Post');
 const PostStatuses = require('../models/domain/Post').PostStatuses;
 const ResourceNotFoundError = require('../exceptions/404Error');
-const PostValidation = require('../validations/post');
+const PostValidations = require('../validations/post');
 const InvalidSubmissionDataError = require('../exceptions/InvalidSubmissionDataError');
 const ActionNotAcceptableError = require('../exceptions/ActionNotAcceptableError');
+const typeUtils = require('../utils/types');
 
 class PostService {
     async findOne(id, throwError = true) {
@@ -22,7 +23,15 @@ class PostService {
         return null;
     }
 
-    async findAll({ startingAfter, endingBefore, limit = '10', official, status, active = 'true' }) {
+    async findAll({
+                      startingAfter,
+                      endingBefore,
+                      limit = '10',
+                      official,
+                      status,
+                      createdBy,
+                      active = 'true',
+                  }) {
         active = validator.toBoolean(active);
 
         limit = validator.toInt(limit) || 10;
@@ -49,15 +58,19 @@ class PostService {
             }
         }
 
+        if (createdBy && typeUtils.isValidId(createdBy)) {
+            conditions.createdBy = createdBy;
+        }
+
         if (status && PostStatuses.includes(status)) {
             conditions.status = status;
         }
 
-        return Post.find(conditions).sort({ 'createdAt': -1 }).limit(limit);
+        return Post.find(conditions).sort({ createdAt: -1 }).limit(limit);
     }
 
     async create(postDTO) {
-        postDTO = await PostValidation.CreatePostValidationSchema.doValidate(postDTO, {
+        postDTO = await PostValidations.CreatePostValidationSchema.doValidate(postDTO, {
             stripUnknown: true,
             abortEarly: false,
         });
@@ -83,18 +96,18 @@ class PostService {
         let slugToSearch = slug;
         const shouldAppendSuffix = suffix > 0;
         if (shouldAppendSuffix) {
-            slugToSearch = `${slug}-${suffix}`
+            slugToSearch = `${slug}-${suffix}`;
         }
 
         if (await this.isNonExistSlug(slugToSearch)) {
             return slugToSearch;
         } else {
-            return this.getUniqueSlug(slug, suffix + 1)
+            return this.getUniqueSlug(slug, suffix + 1);
         }
     }
 
     async update(postId, postDTO) {
-        postDTO = await PostValidation.UpdatePostValidationSchema.doValidate(postDTO,  {
+        postDTO = await PostValidations.UpdatePostValidationSchema.doValidate(postDTO, {
             stripUnknown: true,
             abortEarly: false,
         });
@@ -119,11 +132,11 @@ class PostService {
         if (hasDataToUpdate) {
             await targetPost.updateOne(
                 {
-                    $set: postDTO
+                    $set: postDTO,
                 },
                 {
-                    runValidators: true
-                }
+                    runValidators: true,
+                },
             );
 
             return await this.findOne(postId);
@@ -149,12 +162,12 @@ class PostService {
         await post.updateOne(
             {
                 $set: {
-                    status: 'public'
-                }
+                    status: 'public',
+                },
             },
             {
-                runValidators: true
-            }
+                runValidators: true,
+            },
         );
     }
 
@@ -175,12 +188,12 @@ class PostService {
         await post.updateOne(
             {
                 $set: {
-                    official
-                }
+                    official,
+                },
             },
             {
-                runValidators: true
-            }
+                runValidators: true,
+            },
         );
     }
 }

@@ -1,5 +1,6 @@
 const ResourceNotFoundError = require('../exceptions/404Error');
 const typeUtils = require('./types');
+const logger = require('log4js').getLogger('app');
 
 function exceptionHandler(requestHandler) {
     if (!requestHandler || typeof requestHandler !== 'function') {
@@ -10,6 +11,7 @@ function exceptionHandler(requestHandler) {
         try {
             await requestHandler(req, res, next);
         } catch (e) {
+            logger.error(e);
             next(e);
         }
     }
@@ -23,7 +25,12 @@ function checkValidId(req, res, next, id) {
     next();
 }
 
+function sendNoContentCode(res) {
+    return res.status(204).send();
+}
+
 module.exports = {
     exceptionHandler,
-    checkValidId
+    checkValidId,
+    sendNoContentCode
 }

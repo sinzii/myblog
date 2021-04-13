@@ -1,9 +1,10 @@
 const crypto = require('crypto');
 const mongoose = require('mongoose');
 const User = mongoose.model('User');
-const UserDTOSchema = require('../validations/UserDTO');
+const UserValidations = require('../validations/user');
 const ResourceNotFoundError = require('../exceptions/404Error');
 const InvalidSubmissionDataError = require('../exceptions/InvalidSubmissionDataError');
+const validator = require('validator');
 
 class UserService {
     /**
@@ -17,14 +18,46 @@ class UserService {
      * }
      */
     async create(userDTO) {
-        userDTO = await UserDTOSchema.CreateUserDTOSchema.doValidate(userDTO, {
+        userDTO = await UserValidations.CreateUserValidationSchema.doValidate(userDTO, {
             stripUnknown: true,
             abortEarly: false,
         });
+
         await this._addHashPassword(userDTO);
+        await this.checkUniqueUsernameAndEmail(userDTO.username, userDTO.email);
 
         const newUser = new User(userDTO);
         return await newUser.save();
+    }
+
+    async isUniqueEmail(email) {
+        const existedUsers = await User.find({ email }).limit(1);
+        return existedUsers.length === 0;
+    }
+
+    async isUniqueUsername(username) {
+        const existedUsers = await User.find({ username }).limit(1);
+        return existedUsers.length === 0;
+    }
+
+    async checkUniqueUsernameAndEmail(username, email) {
+        const isUniqueUsername = await this.isUniqueUsername(username);
+        const isUniqueEmail = await this.isUniqueEmail(email);
+
+        const errors = {};
+        if (!isUniqueUsername) {
+            errors.username = 'This username has already been taken';
+        }
+
+        if (!isUniqueEmail) {
+            errors.email = 'This email has already been taken';
+        }
+
+        const hasErrors = Object.keys(errors).length > 0;
+
+        if (hasErrors) {
+            throw new InvalidSubmissionDataError(undefined, errors);
+        }
     }
 
     /**
@@ -34,32 +67,26 @@ class UserService {
      *     name: 'First Last',
      *     username: 'an_unique_name',
      *     email: 'an_unique_email',
-     *     password: 'password_to_change',
      *     avatar: 'https://path/to/avatar_image'
      * }
      */
     async update(userId, userDTO) {
-        userDTO = await UserDTOSchema.UpdateUserDTOSchema.doValidate(userDTO, {
+        userDTO = await UserValidations.UpdateUserValidationSchema.doValidate(userDTO, {
             stripUnknown: true,
             abortEarly: false,
         });
 
         const targetUser = await this.findOne(userId);
 
-        await this._addHashPassword(userDTO, targetUser.salt);
-        if (targetUser.passwordHash === userDTO.passwordHash) {
-            throw new InvalidSubmissionDataError(undefined, {
-                password: 'Please use a new password for your security',
-            });
-        }
+        await this.checkUniqueUsernameAndEmail(userDTO.username, userDTO.email);
 
         await targetUser.updateOne(
             {
                 $set: userDTO,
             },
             {
-                runValidators: true
-            }
+                runValidators: true,
+            },
         );
 
         return await this.findOne(userId);
@@ -74,9 +101,25 @@ class UserService {
         delete userDTO.password;
     }
 
-    async updatePassword(userId, newPassword) {
+    async updatePassword(userId, passwordDTO) {
+        passwordDTO = await UserValidations.UpdatePasswordValidationSchema.doValidate(passwordDTO, {
+            stripUnknown: true,
+            abortEarly: false,
+        });
+
         const targetUser = await this.findOne(userId);
-        const { passwordHash, salt } = this.hashingPassword(newPassword);
+
+        // check if current password is correct
+        const currentPasswordDTO = { password: passwordDTO.currentPassword };
+        await this._addHashPassword(currentPasswordDTO, targetUser.salt);
+        if (currentPasswordDTO.passwordHash !== targetUser.passwordHash) {
+            throw new InvalidSubmissionDataError(undefined, {
+                password: 'Please use a new password for your security',
+            });
+        }
+
+        // save new password
+        const { passwordHash, salt } = this.hashingPassword(passwordHash.newPassword);
         targetUser.passwordHash = passwordHash;
         targetUser.salt = salt;
 
@@ -90,7 +133,7 @@ class UserService {
 
         function hashing() {
             return new Promise((resolve, reject) => {
-                crypto.pbkdf2(rawPassword, salt, 10000, 100, 'sha512', function (err, derivedKey) {
+                crypto.pbkdf2(rawPassword, salt, 10000, 100, 'sha512', function(err, derivedKey) {
                     if (err) {
                         reject(err);
                     } else {
@@ -121,15 +164,27 @@ class UserService {
 
     async activate(userId) {
         const targetUser = await this.findOne(userId);
-        targetUser.active = false;
+        targetUser.active = true;
         return await targetUser.save();
     }
 
-    async findAll(searchQuery, offset = 0, limit = 10) {
-        let userFilterConditions = {};
+    async findAll({
+                      searchQuery,
+                      startingAfter,
+                      endingBefore,
+                      limit = '10',
+                      active = 'true',
+                  }) {
+        active = validator.toBoolean(active);
+
+        limit = validator.toInt(limit) || 10;
+        limit = limit > 100 || limit <= 0 ? 10 : limit;
+
+        const conditions = { active };
+        const $and = [];
         if (searchQuery) {
             searchQuery = String(searchQuery).replace(/[-[\]{}()*+?.,\\/^$|#\s]/g, '\\$&');
-            userFilterConditions = {
+            $and.push({
                 $or: [
                     {
                         name: {
@@ -147,14 +202,30 @@ class UserService {
                         },
                     },
                 ],
-            };
+            });
         }
 
-        return await User.find(userFilterConditions)
-            .skip(offset)
-            .limit(limit)
+        if (startingAfter) {
+            $and.push({
+                _id: {
+                    $gt: startingAfter,
+                },
+            });
+        } else if (endingBefore) {
+            $and.push({
+                _id: {
+                    $lt: endingBefore,
+                },
+            });
+        }
+
+        if ($and.length > 0) {
+            conditions.$and = $and;
+        }
+
+        return User.find(conditions)
             .sort({ createdAt: -1 })
-            .exec();
+            .limit(limit);
     }
 
     async findOne(userId, throwError = true) {
@@ -168,6 +239,19 @@ class UserService {
         }
 
         return null;
+    }
+
+    removeSensitiveInformation(users) {
+        if (!users || users.length === 0) {
+            return;
+        }
+
+        users.forEach(u => {
+            u.set('passwordHash', undefined);
+            u.set('salt', undefined);
+        });
+
+        return users;
     }
 }
 

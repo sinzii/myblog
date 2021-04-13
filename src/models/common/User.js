@@ -18,6 +18,10 @@ const UserSchema = new mongoose.Schema(
                 unique: true,
                 required: true,
             },
+            emailVerified: {
+                type: Boolean,
+                default: false
+            },
             passwordHash: String,
             salt: String,
             avatar: String,
