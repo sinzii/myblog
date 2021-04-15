@@ -7,5 +7,12 @@
         "username": "YOUR_ADMIN_USERNAME",
         "email": "YOUR_ADMIN_EMAIL",
         "password": "YOUR_ADMIN_PASSWORD"
+    },
+    "auth": {
+        "accessTokenSecretKey": "accessTokenSecretKey",
+        "accessTokenExpiresInDay": 14,
+        "refreshTokenSecretKey": "refreshTokenSecretKey",
+        "refreshTokenExpiresInDay": 28,
+        "issuer": "MyBlogAPI"
     }
 }

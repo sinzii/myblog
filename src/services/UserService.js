@@ -234,6 +234,28 @@ class UserService {
             return user;
         }
 
+        return this._returnNullOrThrowError(throwError);
+    }
+
+    async findOneByEmail(email, throwError = true) {
+        const user = await User.findOne({ email });
+        if (user) {
+            return user;
+        }
+
+        return this._returnNullOrThrowError(throwError);
+    }
+
+    async findOneByUsername(username, throwError = true) {
+        const user = await User.findOne({ username });
+        if (user) {
+            return user;
+        }
+
+        return this._returnNullOrThrowError(throwError);
+    }
+
+    _returnNullOrThrowError(throwError = true) {
         if (throwError) {
             throw new ResourceNotFoundError('User is not existed');
         }
