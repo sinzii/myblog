@@ -1,5 +1,3 @@
-# MyBlog
+# MyBlog Backend API
 
-My personal blog written in MERN stack
-
--   Under development
+An underdevelopment blogging backend API
